@@ -1,7 +1,7 @@
 # Triana Skills
 
 Triana Skills contains one thin onboarding skill for Codex and Claude. It
-guides an authorized local trace through the exact `triana-preview==0.1.0a1`
+guides an authorized local trace through the exact `triana-preview==0.1.0a2`
 command line and contains no analysis engine or provider implementation.
 
 Triana Preview turns conversational-agent traces into a proposed,

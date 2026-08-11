@@ -1,7 +1,7 @@
 interface:
   display_name: "Triana Onboard"
   short_description: "Build a local Behavior Map from traces"
-  default_prompt: "Use $onboard on my local trace path and agent description; explain the model step, ask where my existing setup lives, and get my approval before reading traces, sending redacted excerpts, or setting a maximum request ceiling."
+  default_prompt: "Use $onboard on my local trace path and agent description; explain the model step, ask where my existing setup lives, get my approval before reading traces or sending redacted excerpts, run doctor, and verify the local report."
 
 policy:
   allow_implicit_invocation: true

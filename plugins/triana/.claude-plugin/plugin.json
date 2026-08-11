@@ -1,6 +1,6 @@
 {
   "name": "triana",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Build a local Behavior Map from authorized conversational traces with plain, explicit model and data controls.",
   "author": {
     "name": "Akarsh Gajbhiye"

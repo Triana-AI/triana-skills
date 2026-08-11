@@ -14,7 +14,7 @@ REPOSITORY = Path(__file__).resolve().parents[1]
 PLUGIN = REPOSITORY / "plugins" / "triana"
 SKILL = PLUGIN / "skills" / "onboard"
 PINNED_PREFIX = (
-    "uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview"
+    "uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview"
 )
 EXPECTED_FILES = {
     ".agents/plugins/marketplace.json",
@@ -97,7 +97,7 @@ class PublicSkillsContractTests(unittest.TestCase):
         ):
             manifest = _json(manifest_path)
             self.assertEqual(manifest.get("name"), "triana")
-            self.assertEqual(manifest.get("version"), "0.1.1")
+            self.assertEqual(manifest.get("version"), "0.1.2")
             self.assertEqual(manifest.get("license"), "Apache-2.0")
 
         skill_text = _text(SKILL / "SKILL.md")
@@ -109,14 +109,14 @@ class PublicSkillsContractTests(unittest.TestCase):
     def test_every_command_uses_one_exact_preview_pin(self) -> None:
         skill_text = _text(SKILL / "SKILL.md")
         versions = set(re.findall(r"triana-preview==([0-9A-Za-z.]+)", skill_text))
-        self.assertEqual(versions, {"0.1.0a1"})
+        self.assertEqual(versions, {"0.1.0a2"})
 
         command_lines = [
             line.strip()
             for line in skill_text.splitlines()
             if line.strip().startswith("uvx ")
         ]
-        self.assertGreaterEqual(len(command_lines), 6)
+        self.assertGreaterEqual(len(command_lines), 8)
         for line in command_lines:
             self.assertTrue(line.startswith(PINNED_PREFIX), line)
 
@@ -127,7 +127,16 @@ class PublicSkillsContractTests(unittest.TestCase):
         }
         self.assertEqual(
             commands,
-            {"inspect", "validate", "scaffold", "preview", "analyze", "verify-report"},
+            {
+                "doctor",
+                "inspect",
+                "validate",
+                "scaffold",
+                "adapter-execute",
+                "preview",
+                "analyze",
+                "verify-report",
+            },
         )
 
     def test_skill_is_instructions_only_and_contains_no_private_runtime(self) -> None:
@@ -141,10 +150,14 @@ class PublicSkillsContractTests(unittest.TestCase):
         lowered = public_text.lower()
         for forbidden in (
             "docker",
+            "image",
             "triana_behavior_map_",
             "@sha256:",
             "release-profile",
             "release manifest",
+            "runtime manifest",
+            "adapter.py",
+            "python adapter",
             "tau2-luna",
             "kairos-memory",
             "blitz_identifier",
@@ -196,6 +209,11 @@ class PublicSkillsContractTests(unittest.TestCase):
         ):
             self.assertIn(phrase, combined)
         for hidden in (
+            "docker",
+            "image",
+            "release profile",
+            "release manifest",
+            "runtime manifest",
             "image digest",
             "taxonomy input",
             "credential boundary",
@@ -316,6 +334,36 @@ class PublicSkillsContractTests(unittest.TestCase):
         self.assertIn("source-available", readme)
         self.assertIn("not open source", readme)
         self.assertNotRegex(readme, r"triana preview (?:is|as) open[- ]source")
+
+    def test_codex_claude_metadata_and_documented_pin_are_cache_equivalent(self) -> None:
+        codex = _json(PLUGIN / ".codex-plugin" / "plugin.json")
+        claude = _json(PLUGIN / ".claude-plugin" / "plugin.json")
+        for field in ("name", "version", "description", "license", "skills"):
+            self.assertEqual(codex.get(field), claude.get(field), field)
+        self.assertEqual(codex["version"], "0.1.2")
+        self.assertEqual(codex["skills"], "./skills/")
+
+        skill = _text(SKILL / "SKILL.md")
+        metadata = _text(SKILL / "agents" / "openai.yaml")
+        for required in (
+            "doctor",
+            "scaffold",
+            "adapter-execute",
+            "validate",
+            "preview",
+            "analyze",
+            "verify-report",
+        ):
+            self.assertIn(required, skill)
+        self.assertIn("doctor", metadata.lower())
+
+        documented = "\n".join(
+            _text(path)
+            for path in (REPOSITORY / "README.md", SKILL / "SKILL.md")
+        )
+        for line in documented.splitlines():
+            if "uvx " in line:
+                self.assertIn(PINNED_PREFIX, line.strip())
 
     def test_apache_metadata_and_static_clean_directory_contract(self) -> None:
         license_text = _text(REPOSITORY / "LICENSE")

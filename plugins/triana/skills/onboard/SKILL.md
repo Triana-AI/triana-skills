@@ -57,53 +57,73 @@ single canonical JSON receipt from stdout after each command and stop on a
 refusal. Package-index access may be required the first time `uvx` resolves the
 exact runtime; this does not authorize reading traces or provider egress.
 
-### 1. Inspect
+### 1. Doctor
+
+After trace authorization and access to the exact model setup location, derive
+the private provider file as described below, then verify the complete local
+onboarding boundary without provider egress:
+
+```sh
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview doctor --source "$TRACE_PATH" --output-dir "$REPORT_DIR" --plugin-root "$PLUGIN_ROOT" --provider-env "$PROVIDER_FILE" --confirm-authorized-traces
+```
+
+Use `--no-provider` instead of `--provider-env` only for the advanced
+structural diagnostic. Doctor performs zero model requests and needs neither
+egress approval nor a request ceiling. Stop if any version, exact pin, plugin,
+permission, provider-file, output, or trace check refuses.
+
+### 2. Inspect
 
 Run content-free structural inspection first:
 
 ```sh
-uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview inspect --source "$TRACE_PATH" --confirm-authorized-traces
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview inspect --source "$TRACE_PATH" --confirm-authorized-traces
 ```
 
 Do not print or summarize trace values. Use only the structural receipt to
 decide whether the source already satisfies PreviewTrace.
 
-### 2. Adapt only when required
+### 3. Adapt only when required
 
 If inspection or validation shows that the source is not PreviewTrace, create
 the bounded local implementation seam:
 
 ```sh
-uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview scaffold --source "$TRACE_PATH" --output-dir "$ADAPTER_DIR" --confirm-authorized-traces
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview scaffold --source "$TRACE_PATH" --output-dir "$ADAPTER_DIR" --confirm-authorized-traces
 ```
 
-Implement the mapping in the customer's workspace, not in this skill. Preserve
-conversation and event order, roles, tool-call/result linkage, terminal state,
-and stable identity. The scaffold writes private `adapter.py` and
-`adapter-contract.json` files; complete the adapter locally and write its
-PreviewTrace JSONL to a new path. Do not infer missing meaning. Re-run
-validation on that adapter output. If the mapping remains unclear, return
-`IMPLEMENTATION_REQUIRED` instead of guessing.
+The scaffold writes private `adapter-mapping.json` and `adapter-contract.json`
+files. Complete only the closed declarative field and role mapping. Preserve
+conversation and event order, roles, terminal state, and stable identity. Do
+not add or execute code and do not infer missing meaning. If the mapping is
+complete, execute it deterministically into a new PreviewTrace path:
 
-### 3. Validate
+```sh
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview adapter-execute --source "$TRACE_PATH" --mapping "$ADAPTER_MAPPING" --output "$PREVIEW_TRACE_PATH" --confirm-authorized-traces
+```
+
+If required source facts or role mappings remain unclear, stop on the typed
+mapping refusal instead of guessing.
+
+### 4. Validate
 
 Write a new validated file without overwriting the source:
 
 ```sh
-uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview validate --source "$PREVIEW_TRACE_PATH" --output "$VALIDATED_PATH" --confirm-authorized-traces
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview validate --source "$PREVIEW_TRACE_PATH" --output "$VALIDATED_PATH" --confirm-authorized-traces
 ```
 
-### 4. Preview
+### 5. Preview
 
 Review only the bounded redacted shape preview:
 
 ```sh
-uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview preview --source "$VALIDATED_PATH" --confirm-authorized-traces
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview preview --source "$VALIDATED_PATH" --confirm-authorized-traces
 ```
 
 Do not copy preview values into chat. Stop on any residual-identifier refusal.
 
-### 5. Analyze
+### 6. Analyze
 
 Create a fresh local output directory path that does not yet exist or is empty.
 
@@ -130,24 +150,28 @@ lineage, and verification.
 For the advanced no-model structural diagnostic only:
 
 ```sh
-uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview analyze --traces "$VALIDATED_PATH" --agent "$AGENT_DESCRIPTION" --output "$REPORT_DIR" --confirm-authorized-traces --no-provider
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview analyze --traces "$VALIDATED_PATH" --agent "$AGENT_DESCRIPTION" --output "$REPORT_DIR" --confirm-authorized-traces --no-provider
 ```
 
 For explicitly authorized provider mode:
 
 ```sh
-uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview analyze --traces "$VALIDATED_PATH" --agent "$AGENT_DESCRIPTION" --output "$REPORT_DIR" --provider-env "$PROVIDER_FILE" --max-provider-calls "$MAX_PROVIDER_CALLS" --confirm-authorized-traces --confirm-provider-egress
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview analyze --traces "$VALIDATED_PATH" --agent "$AGENT_DESCRIPTION" --output "$REPORT_DIR" --provider-env "$PROVIDER_FILE" --max-provider-calls "$MAX_PROVIDER_CALLS" --confirm-authorized-traces --confirm-provider-egress
 ```
 
 The modes are mutually exclusive. Do not use ambient credentials. Do not add
 retry, fallback, extra network access, or an alternative model.
 
-### 6. Verify
+Read content-free phase receipts from stderr while analysis runs. A failed
+semantic phase and the final stdout receipt may expose only its typed stage,
+safe failure code/class, and optional HTTP status. Never display provider prose.
+
+### 7. Verify
 
 Verify the retained report before presenting it:
 
 ```sh
-uvx --python 3.13 --from 'triana-preview==0.1.0a1' triana-preview verify-report --output-dir "$REPORT_DIR" --confirm-authorized-traces
+uvx --python 3.13 --from 'triana-preview==0.1.0a2' triana-preview verify-report --output-dir "$REPORT_DIR" --confirm-authorized-traces
 ```
 
 For an authorized provider run, add `--require-semantic`. A valid report with
