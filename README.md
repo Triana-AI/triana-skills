@@ -31,9 +31,19 @@ claude plugin install triana@triana-skills
 Restart the agent after installation so it discovers the new skill. The agent
 will not read trace data until you explicitly authorize the trace path.
 
-The agent requests only the trace path, short agent description, trace
-authorization, and either no-provider mode or a private provider file with
-provider-egress authorization and a maximum call ceiling.
+Start with a natural request:
+
+```text
+Use Triana on this trace file: /path/to/traces.
+This is what my agent does: <short description>.
+```
+
+The agent explains why a model is needed for a semantic Behavior Map, asks
+before reading traces or sending redacted excerpts, uses only the existing
+model setup location you identify, and proposes a maximum request ceiling after
+local structural inspection. Redacted excerpts go directly from your machine
+to the model service you choose; nothing is sent to Triana. It never asks you
+to paste a secret.
 
 The skill is Apache-2.0. The separately distributed Triana Preview runtime is
 source-available under its own terms; Triana Preview is not open source.

@@ -1,7 +1,7 @@
 {
   "name": "triana",
-  "version": "0.1.0",
-  "description": "Onboard authorized local conversational traces into Triana Preview.",
+  "version": "0.1.1",
+  "description": "Build a local Behavior Map from authorized conversational traces with plain, explicit model and data controls.",
   "author": {
     "name": "Akarsh Gajbhiye"
   },

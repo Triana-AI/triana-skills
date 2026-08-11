@@ -97,7 +97,7 @@ class PublicSkillsContractTests(unittest.TestCase):
         ):
             manifest = _json(manifest_path)
             self.assertEqual(manifest.get("name"), "triana")
-            self.assertEqual(manifest.get("version"), "0.1.0")
+            self.assertEqual(manifest.get("version"), "0.1.1")
             self.assertEqual(manifest.get("license"), "Apache-2.0")
 
         skill_text = _text(SKILL / "SKILL.md")
@@ -204,6 +204,87 @@ class PublicSkillsContractTests(unittest.TestCase):
             "usd budget",
         ):
             self.assertNotIn(hidden, combined)
+
+    def test_first_run_dialogue_is_plain_and_keeps_user_authority(self) -> None:
+        skill_text = _text(SKILL / "SKILL.md").lower()
+        execution_marker = "## execute the bounded workflow"
+        self.assertIn(execution_marker, skill_text)
+        opening = " ".join(skill_text.split(execution_marker, 1)[0].split())
+        all_instructions = " ".join(skill_text.split())
+
+        for phrase in (
+            "trace path",
+            "agent description",
+            "model",
+            "redacted excerpts",
+            "interpret",
+            "directly from the user's machine",
+            "model service the user chooses",
+            "exact trace path",
+            "locally",
+            "already configured",
+            "maximum number of model requests",
+            "nothing is sent to triana",
+        ):
+            self.assertIn(phrase, opening)
+        self.assertRegex(opening, r"where (?:that|the model) setup lives")
+        self.assertRegex(opening, r"(?:do not|never) (?:ask (?:the user )?to )?paste.*secret")
+        self.assertRegex(opening, r"explicit (?:permission|approval).*(?:send|model)")
+
+        for first_run_jargon in (
+            "provider",
+            "api key",
+            "--provider-env",
+            "--no-provider",
+            "--max-provider-calls",
+            "--confirm-provider-egress",
+        ):
+            self.assertNotIn(first_run_jargon, opening)
+
+        for phrase in (
+            "exact configuration location",
+            "named variables",
+            "ambient credentials",
+            "do not source executable configuration",
+            "do not print or repeat secrets",
+            "hidden plumbing",
+            "0600",
+            "openai-compatible https base url",
+            "api key",
+            "explicit model",
+            "validate its permissions",
+            "remove the derived file",
+            "advanced structural diagnostic",
+            "cannot produce the requested semantic behavior map",
+            "model proposes semantic labels",
+            "deterministic runtime code",
+        ):
+            self.assertIn(phrase, all_instructions)
+        self.assertRegex(
+            all_instructions,
+            r"(?:do not|must not) (?:discover|search for) ambient credentials",
+        )
+        self.assertRegex(
+            all_instructions,
+            r"before (?:model )?(?:egress|sending).*approval",
+        )
+        self.assertRegex(
+            all_instructions,
+            r"offered only when the user declines model use or no authorized setup exists",
+        )
+        self.assertRegex(
+            all_instructions,
+            r"max\s*\(\s*20\s*,\s*3\s*\*\s*trace_count\s*\)",
+        )
+        self.assertIn(
+            "ceiling rather than an estimate of actual usage or cost",
+            all_instructions,
+        )
+        self.assertIn("require explicit approval", all_instructions)
+        self.assertRegex(
+            all_instructions,
+            r"never silently (?:select|increase).*(?:ceiling|limit)",
+        )
 
     def test_public_documents_state_the_same_custody_and_egress_boundary(self) -> None:
         privacy = _text(REPOSITORY / "PRIVACY.md").lower()
