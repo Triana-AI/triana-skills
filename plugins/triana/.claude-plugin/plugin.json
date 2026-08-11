@@ -1,0 +1,10 @@
+{
+  "name": "triana",
+  "version": "0.1.0",
+  "description": "Onboard authorized local conversational traces into Triana Preview.",
+  "author": {
+    "name": "Akarsh Gajbhiye"
+  },
+  "license": "Apache-2.0",
+  "skills": "./skills/"
+}

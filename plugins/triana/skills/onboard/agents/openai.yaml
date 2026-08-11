@@ -1,0 +1,7 @@
+interface:
+  display_name: "Triana Onboard"
+  short_description: "Build a local Behavior Map from traces"
+  default_prompt: "Use $onboard to inspect and analyze my authorized local trace path, asking only for my agent description, trace authorization, and provider choice."
+
+policy:
+  allow_implicit_invocation: true

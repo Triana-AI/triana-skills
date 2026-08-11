@@ -1,0 +1,21 @@
+{
+  "name": "triana-skills",
+  "description": "Local, authorization-gated onboarding for Triana Preview conversational trace analysis.",
+  "interface": {
+    "displayName": "Triana Skills"
+  },
+  "plugins": [
+    {
+      "name": "triana",
+      "source": {
+        "source": "local",
+        "path": "./plugins/triana"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

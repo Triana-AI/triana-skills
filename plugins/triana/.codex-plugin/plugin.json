@@ -1,0 +1,28 @@
+{
+  "name": "triana",
+  "version": "0.1.0",
+  "description": "Onboard authorized local conversational traces into Triana Preview.",
+  "author": {
+    "name": "Akarsh Gajbhiye"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-evaluation",
+    "behavior-map",
+    "conversational-traces"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Triana",
+    "shortDescription": "Build a local evidence-grounded Behavior Map",
+    "longDescription": "Guide an authorized local trace through inspection, adaptation when needed, validation, analysis, and report verification.",
+    "developerName": "Akarsh Gajbhiye",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": [
+      "Onboard my authorized local agent traces with Triana."
+    ]
+  }
+}

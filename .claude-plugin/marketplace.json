@@ -1,0 +1,13 @@
+{
+  "name": "triana-skills",
+  "description": "Local, authorization-gated onboarding for Triana Preview conversational trace analysis.",
+  "owner": {
+    "name": "Akarsh Gajbhiye"
+  },
+  "plugins": [
+    {
+      "name": "triana",
+      "source": "./plugins/triana"
+    }
+  ]
+}
